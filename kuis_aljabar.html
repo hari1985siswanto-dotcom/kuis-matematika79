@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Aljabar Kelas 7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden-section { display: none; }
+        .emoji-btn { transition: transform 0.2s; }
+        .emoji-btn:hover { transform: scale(1.2); }
+        .selected-emoji { transform: scale(1.3); border: 2px solid #22c55e; border-radius: 50%; padding: 4px; background-color: #dcfce7; }
+    </style>
+</head>
+<body class="bg-emerald-50 min-h-screen flex items-center justify-center p-4 font-sans text-gray-800">
+
+    <div class="max-w-lg w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-emerald-100">
+        
+        <!-- HALAMAN AWAL -->
+        <div id="start-page" class="p-8">
+            <h1 class="text-3xl font-bold text-emerald-600 text-center mb-6">Selamat mengerjakan kuis Aljabar kelas 7.</h1>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="student-name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none" placeholder="Masukkan nama...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                    <select id="student-class" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none">
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="78">78</option>
+                        <option value="79">79</option>
+                    </select>
+                </div>
+                <button onclick="startQuiz()" class="w-full mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-lg transition-colors">Mulai Kuis</button>
+            </div>
+        </div>
+
+        <!-- HALAMAN KUIS -->
+        <div id="quiz-page" class="p-8 hidden-section">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-sm font-semibold text-emerald-600" id="question-tracker">Soal 1 dari 5</span>
+                <span class="text-sm bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">Aljabar</span>
+            </div>
+            <h2 id="question-text" class="text-lg font-medium mb-6">Pertanyaan...</h2>
+            <div id="options-container" class="space-y-3">
+                <!-- Opsi dirender via JS -->
+            </div>
+        </div>
+
+        <!-- HALAMAN REFLEKSI -->
+        <div id="reflection-page" class="p-8 hidden-section text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Bagaimana perasaanmu setelah mengerjakan kuis ini?</h2>
+            <div class="flex justify-center gap-6 mb-8 text-6xl cursor-pointer">
+                <div class="emoji-btn" onclick="selectEmotion('😄', this)">😄</div>
+                <div class="emoji-btn" onclick="selectEmotion('😐', this)">😐</div>
+                <div class="emoji-btn" onclick="selectEmotion('😢', this)">😢</div>
+            </div>
+            <button id="submit-btn" onclick="showResults()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-lg transition-colors hidden-section">Kirim & Lihat Hasil</button>
+        </div>
+
+        <!-- HALAMAN AKHIR -->
+        <div id="result-page" class="p-8 hidden-section text-center bg-emerald-600 text-white">
+            <h2 class="text-3xl font-bold mb-2">Kuis Selesai!</h2>
+            <div class="bg-white text-gray-800 rounded-xl p-6 mt-6 shadow-inner">
+                <p class="text-sm text-gray-500 uppercase tracking-wide">Identitas</p>
+                <p class="font-bold text-xl" id="res-name">-</p>
+                <p class="text-md text-emerald-600 font-semibold mb-4">Kelas <span id="res-class">-</span></p>
+                
+                <p class="text-sm text-gray-500 uppercase tracking-wide">Skor Akhir</p>
+                <p class="text-6xl font-black text-emerald-500 my-2" id="res-score">0</p>
+                
+                <p class="text-sm text-gray-500 uppercase tracking-wide mt-4">Perasaan</p>
+                <p class="text-4xl mt-1" id="res-emotion">😄</p>
+            </div>
+            <div class="mt-6 p-4 bg-emerald-800 rounded-lg border border-emerald-500 border-dashed">
+                <p class="font-semibold">⚠️ PENTING ⚠️</p>
+                <p class="text-sm mt-1">Screenshot halaman ini dan kirim ke whatsapp guru-mu</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Tentukan variabel dari bentuk aljabar 7x + 12.", options: ["7", "x", "12", "7x"], answer: 1 },
+            { q: "Berapakah koefisien dari ab pada bentuk aljabar -6a² + 4ab - 9b + 12?", options: ["-6", "4", "-9", "12"], answer: 1 },
+            { q: "Hasil penyederhanaan suku sejenis dari (3x + 5y) + (4x - 2y) adalah...", options: ["7x + 7y", "x + 3y", "7x + 3y", "12x - 10y"], answer: 2 },
+            { q: "Tentukan banyak suku pada bentuk aljabar 8p² - 5pq + 3p - 11.", options: ["2 suku", "3 suku", "4 suku", "5 suku"], answer: 2 },
+            { q: "Mengapa 4ab dan -8ba disebut suku yang sejenis?", options: ["Karena memiliki variabel yang sama meskipun urutannya berbeda.", "Karena memiliki koefisien yang saling berkelipatan.", "Karena keduanya bernilai positif dan negatif.", "Keduanya bukan merupakan suku sejenis."], answer: 0 }
+        ];
+
+        let currentQ = 0, score = 0, studentData = { name: '', class: '', feeling: '' };
+
+        function startQuiz() {
+            studentData.name = document.getElementById('student-name').value;
+            studentData.class = document.getElementById('student-class').value;
+            if(!studentData.name || !studentData.class) return alert("Silakan isi Nama dan Kelas terlebih dahulu.");
+            document.getElementById('start-page').classList.add('hidden-section');
+            document.getElementById('quiz-page').classList.remove('hidden-section');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if(currentQ >= questions.length) {
+                document.getElementById('quiz-page').classList.add('hidden-section');
+                document.getElementById('reflection-page').classList.remove('hidden-section');
+                return;
+            }
+            document.getElementById('question-tracker').innerText = `Soal ${currentQ + 1} dari 5`;
+            document.getElementById('question-text').innerText = questions[currentQ].q;
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            questions[currentQ].options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-lg border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition-colors";
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(idx === questions[currentQ].answer) score += 20;
+                    currentQ++;
+                    loadQuestion();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function selectEmotion(emo, el) {
+            studentData.feeling = emo;
+            document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('selected-emoji'));
+            el.classList.add('selected-emoji');
+            document.getElementById('submit-btn').classList.remove('hidden-section');
+        }
+
+        function showResults() {
+            document.getElementById('reflection-page').classList.add('hidden-section');
+            document.getElementById('result-page').classList.remove('hidden-section');
+            
+            document.getElementById('res-name').innerText = studentData.name;
+            document.getElementById('res-class').innerText = studentData.class;
+            document.getElementById('res-score').innerText = score;
+            document.getElementById('res-emotion').innerText = studentData.feeling;
+
+            sendDataToDashboard();
+        }
+
+        function sendDataToDashboard() {
+            // URL Web App Google Apps Script telah terhubung
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwZEVyLTcyzhMxjBkr_amn2Fm2A6j6pLhiK4ZFzPSRGSgWjuxvYtgXjml2iui42zPs4/exec'; 
+            
+            let formData = new FormData();
+            formData.append('Nama', studentData.name);
+            formData.append('Kelas', studentData.class);
+            formData.append('Skor', score);
+            formData.append('Perasaan', studentData.feeling);
+
+            // Mengirim data ke spreadsheet tanpa memuat ulang halaman
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(response => console.log("Data berhasil terkirim ke Spreadsheet"))
+                .catch(error => console.error('Error!', error.message));
+        }
+    </script>
+</body>
+</html>
